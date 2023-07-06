@@ -10,6 +10,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	int g = 0;
 	int gg = 0;
+	float f = gg;
 	glfwTerminate();
 	return 0;
 }
