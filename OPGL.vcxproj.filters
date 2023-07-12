@@ -75,5 +75,13 @@
     <Image Include="..\..\Desktop\im.png">
       <Filter>File di risorse\Textures</Filter>
     </Image>
+    <Image Include="..\..\Desktop\normal_map.jpg">
+      <Filter>File di risorse\Textures</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\Desktop\TBD.txt">
+      <Filter>File di risorse</Filter>
+    </Text>
   </ItemGroup>
 </Project>

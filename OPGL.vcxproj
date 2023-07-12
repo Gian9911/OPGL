@@ -159,6 +159,10 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\Desktop\im.png" />
+    <Image Include="..\..\Desktop\normal_map.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\Desktop\TBD.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
