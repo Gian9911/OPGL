@@ -89,6 +89,8 @@ int main()
 	float rotation = 0.0f;
 	double prevTime = glfwGetTime();
 
+	//glEnable(GL_DEPTH_TEST);// sennò la piramide resta vuota nel mezzo
+
 	
 	while (!glfwWindowShouldClose(window))
 	{
