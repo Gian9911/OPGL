@@ -38,8 +38,8 @@ int main()
 		3, 0, 4
 	};
 
-	const unsigned int w = 800;
-	const unsigned int h = 800;
+	const unsigned int w = 1910;
+	const unsigned int h = 1600;
 	float startTime = 0.0;
 	float currentTime = 0.0;
 	float color = 0.0;
@@ -99,7 +99,8 @@ int main()
 		shaderProgram.Activate();
 
 		camera.Inputs(window);
-		camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
+		camera.updateMatrix(45.0f, 0.1f, 100.0f);
+		camera.Matrix(shaderProgram, "camMatrix");
 		
 		// Binds texture so that is appears in rendering
 		susImage.Bind();
