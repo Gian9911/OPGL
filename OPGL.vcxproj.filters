@@ -68,6 +68,12 @@
     <None Include="light.vert">
       <Filter>File di risorse\Shaders</Filter>
     </None>
+    <None Include="outlining.vert">
+      <Filter>File di risorse\Shaders</Filter>
+    </None>
+    <None Include="outlining.frag">
+      <Filter>File di risorse\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaderClass.h">
