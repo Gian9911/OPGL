@@ -74,6 +74,21 @@
     <None Include="outlining.frag">
       <Filter>File di risorse\Shaders</Filter>
     </None>
+    <None Include="default.geom">
+      <Filter>File di risorse\Shaders</Filter>
+    </None>
+    <None Include="framebuffer.frag">
+      <Filter>File di risorse\Shaders</Filter>
+    </None>
+    <None Include="framebuffer.vert">
+      <Filter>File di risorse\Shaders</Filter>
+    </None>
+    <None Include="normals.frag">
+      <Filter>File di risorse\Shaders</Filter>
+    </None>
+    <None Include="normals.geom">
+      <Filter>File di risorse\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaderClass.h">
