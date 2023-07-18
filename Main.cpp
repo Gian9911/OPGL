@@ -243,8 +243,8 @@ int main()
 
 	// Paths to textures
 
-	std::string diffusePath = "textures/diffuse.png";
-	std::string normalPath = "textures/normal.png";
+	std::string diffusePath = "textures/stone_wall_diffuse.jpeg";
+	std::string normalPath = "textures/stone_wall_normal.png";
 
 	std::vector<Texture> textures =
 	{
