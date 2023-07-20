@@ -1,4 +1,4 @@
-#include"Model.h"
+#include"Mesh.h"
 
 
 const unsigned int width = 1910;
@@ -97,8 +97,8 @@ int main()
 	// So that means we only have the modern functions
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
-	GLFWwindow* window = glfwCreateWindow(width, height, "YoutubeOpenGL", NULL, NULL);
+	// Create a GLFWwindow object of 800 by 800 pixels
+	GLFWwindow* window = glfwCreateWindow(width, height, "OPGL", NULL, NULL);
 	// Error check if the window fails to create
 	if (window == NULL)
 	{
@@ -153,15 +153,6 @@ int main()
 
 	// Creates camera object
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
-
-
-	/*
-	* I'm doing this relative path thing in order to centralize all the resources into one folder and not
-	* duplicate them between tutorial folders. You can just copy paste the resources from the 'Resources'
-	* folder and then give a relative path from this folder to whatever resource you want to get to.
-	* Also note that this requires C++17, so go to Project Properties, C/C++, Language, and select C++17
-	*/
-
 
 	// Prepare framebuffer rectangle VBO and VAO
 	unsigned int rectVAO, rectVBO;
@@ -252,7 +243,7 @@ int main()
 	};
 
 	// Plane with the texture
-	Mesh plane(vertices, indices, textures);
+	Mesh mesh(vertices, indices, textures);
 	// Normal map for the plane
 	Texture normalMap((normalPath).c_str(), "normal", 1);
 
@@ -271,15 +262,13 @@ int main()
 			// Creates new title
 			std::string FPS = std::to_string((1.0 / timeDiff) * counter);
 			std::string ms = std::to_string((timeDiff / counter) * 1000);
-			std::string newTitle = "YoutubeOpenGL - " + FPS + "FPS / " + ms + "ms";
+			std::string newTitle = "OPGL - " + FPS + "FPS / ";
 			glfwSetWindowTitle(window, newTitle.c_str());
 
 			// Resets times and counter
 			prevTime = crntTime;
 			counter = 0;
 
-			// Use this if you have disabled VSync
-			//camera.Inputs(window);
 		}
 
 
@@ -292,7 +281,7 @@ int main()
 		// Enable depth testing since it's disabled when drawing the framebuffer rectangle
 		glEnable(GL_DEPTH_TEST);
 
-		// Handles camera inputs (delete this if you have disabled VSync)
+
 		camera.Inputs(window);
 		// Updates and exports the camera matrix to the Vertex Shader
 		camera.updateMatrix(45.0f, 0.1f, 100.0f);
@@ -303,7 +292,7 @@ int main()
 		glUniform1i(glGetUniformLocation(shaderProgram.ID, "normal0"), 1);
 
 		// Draw the normal model
-		plane.Draw(shaderProgram, camera);
+		mesh.Draw(shaderProgram, camera);
 
 		// Make it so the multisampling FBO is read while the post-processing FBO is drawn
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
