@@ -17,6 +17,7 @@ public:
 	// Store VAO in public so it can be used in the Draw function
 	VAO VAO;
 
+	glm::vec3 pos = glm::vec3(0.0f);
 	float angle = 0.0f;
 	float s = 1.0f;
 	glm::vec3 direction = glm::vec3(1.0f, 0.0f, 0.0f);

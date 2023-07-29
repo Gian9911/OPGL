@@ -35,10 +35,10 @@ uniform vec3 lightPos;
 // Gets the position of the camera from the main function
 uniform vec3 camPos;
 
-vec3 objPos = aPos;
+vec4 objPos = vec4(aPos, 1.0f);
 void main()
 {
-	gl_Position = model * translation * rotation * scale * vec4(objPos, 1.0f);
+	gl_Position = model * translation * rotation * scale * objPos;
 	objPos = gl_Position;
 	data_out.Normal = aNormal;
 	data_out.color = aColor;

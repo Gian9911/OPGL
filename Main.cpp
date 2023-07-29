@@ -6,8 +6,7 @@ const unsigned int height = 1600;
 // Number of samples per pixel for MSAA
 unsigned int samples = 8;
 
-// Controls the gamma function
-float gamma = 2.2f;
+
 
 float rectangleVertices[] = {
     //  Coords   // texCoords
@@ -58,6 +57,8 @@ std::vector<Vertex> vertices = {
 std::vector<GLuint> indices = {0, 1, 2, 0, 2, 3, 4, 7, 6, 4, 6, 5, 11, 10, 9, 11, 9, 8, 12, 13, 14, 12, 14, 15, 16, 17, 19, 19, 18, 16, 23, 21, 20, 20, 22, 23};
 
 int main() {
+  // Controls the gamma function
+  float gamma = 2.2f;
   // Initialize GLFW
   glfwInit();
 
@@ -208,6 +209,7 @@ int main() {
   float angle = 0.0f;
 	float s = 1.0f;
 	glm::vec3 direction = glm::vec3(1.0f, 0.0f, 0.0f);
+  glm::mat4 rot = glm::mat4(1.0f);
   // Main while loop
   while (!glfwWindowShouldClose(window)) {
     // Updates counter and times
@@ -247,28 +249,28 @@ int main() {
     
 		if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 		{
-			angle += 0.1f;
-			direction += glm::vec3(1.0f, 0.0f, 0.0f);
+			angle = 0.1f;
+			direction = glm::vec3(1.0f, 0.0f, 0.0f);
 
 		}
 		if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
 		{
-			angle += 0.1f;
-			direction += glm::vec3(0.0f, 1.0f, 0.0f);
+			angle = 0.1f;
+			direction = glm::vec3(0.0f, 1.0f, 0.0f);
 
 		}
 		if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
 		{
-			angle += 0.1f;
-			direction += glm::vec3(0.0f, 0.0f, 1.0f);
+			angle = 0.1f;
+			direction = glm::vec3(0.0f, 0.0f, 1.0f);
 
 		}
 	
-    glm::normalize(direction);
+    //glm::normalize(direction);
 		
-		glm::mat4 rot = glm::mat4(1.0f);
+		
 		rot = glm::rotate(rot, glm::radians(angle), direction);
-	
+    angle = 0.0f;
 		// Draw the normal model
 		mesh.Draw(window, shaderProgram, camera, rot);//framebuffer has msaa can't do anything
 
