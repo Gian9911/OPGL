@@ -117,7 +117,7 @@ int main() {
   glFrontFace(GL_CCW);
 
   // Creates camera object
-  Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
+  Camera camera(width, height, glm::vec3(0.0f, 0.5f, 6.0f));
 
   // Prepare framebuffer rectangle VBO and VAO
   unsigned int rectVAO, rectVBO;
@@ -205,6 +205,9 @@ int main() {
   // Normal map for the plane
   Texture normalMap((normalPath).c_str(), "normal", 1);
 
+  float angle = 0.0f;
+	float s = 1.0f;
+	glm::vec3 direction = glm::vec3(1.0f, 0.0f, 0.0f);
   // Main while loop
   while (!glfwWindowShouldClose(window)) {
     // Updates counter and times
@@ -241,8 +244,34 @@ int main() {
     // normalMap.Bind();
     glUniform1i(glGetUniformLocation(shaderProgram.ID, "normal0"), 1);
 
-    // Draw the normal model
-    mesh.Draw(shaderProgram, camera);
+    
+		if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+		{
+			angle += 0.1f;
+			direction += glm::vec3(1.0f, 0.0f, 0.0f);
+
+		}
+		if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
+		{
+			angle += 0.1f;
+			direction += glm::vec3(0.0f, 1.0f, 0.0f);
+
+		}
+		if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+		{
+			angle += 0.1f;
+			direction += glm::vec3(0.0f, 0.0f, 1.0f);
+
+		}
+	
+    glm::normalize(direction);
+		
+		glm::mat4 rot = glm::mat4(1.0f);
+		rot = glm::rotate(rot, glm::radians(angle), direction);
+	
+		// Draw the normal model
+		mesh.Draw(window, shaderProgram, camera, rot);//framebuffer has msaa can't do anything
+
 
     // Make it so the multisampling FBO is read while the post-processing FBO is drawn
     glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);

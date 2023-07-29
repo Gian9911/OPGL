@@ -25,12 +25,14 @@ Mesh::Mesh(std::vector <Vertex>& vertices, std::vector <GLuint>& indices, std::v
 
 void Mesh::Draw
 (
+	GLFWwindow* window,
 	Shader& shader,
 	Camera& camera,
-	glm::mat4 matrix,
-	glm::vec3 translation,
 	glm::quat rotation,
-	glm::vec3 scale
+	glm::vec3 scale,
+	glm::mat4 matrix,
+	glm::vec3 translation
+
 )
 {
 	// Bind shader to be able to access uniforms
@@ -59,16 +61,21 @@ void Mesh::Draw
 	// Take care of the camera Matrix
 	glUniform3f(glGetUniformLocation(shader.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 	camera.Matrix(shader, "camMatrix");
-
+	
 	// Initialize matrices
 	glm::mat4 trans = glm::mat4(1.0f);
 	glm::mat4 rot = glm::mat4(1.0f);
 	glm::mat4 sca = glm::mat4(1.0f);
-
+	
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+		{
+			s += 0.001f;
+		}
+			
 	// Transform the matrices to their correct form
 	trans = glm::translate(trans, translation);
 	rot = glm::mat4_cast(rotation);
-	sca = glm::scale(sca, scale);
+	sca = glm::scale(sca,  glm::vec3(s));
 
 	// Push the matrices to the vertex shader
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, "translation"), 1, GL_FALSE, glm::value_ptr(trans));
