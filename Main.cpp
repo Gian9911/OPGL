@@ -91,7 +91,9 @@ int main() {
 
   // Generates shaders
   Shader shaderProgram("default.vert", "default.frag", "default.geom");
+  
   Shader framebufferProgram("framebuffer.vert", "framebuffer.frag");
+  
 
   // Take care of all the light related things
   glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -100,6 +102,7 @@ int main() {
   shaderProgram.Activate();
   glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
   glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+  
   framebufferProgram.Activate();
   glUniform1i(glGetUniformLocation(framebufferProgram.ID, "screenTexture"), 0);
   glUniform1f(glGetUniformLocation(framebufferProgram.ID, "gamma"), gamma);
@@ -193,7 +196,7 @@ int main() {
 
   // Paths to textures
 
-  std::string diffusePath = "textures/texture_legno.png";
+  std::string diffusePath = "textures/diffuse.png";
   // Crea normal in textrues/normal_map.png"
   ImageProcessing ip;
   ip.compute_normal_map(diffusePath, 1);
@@ -204,14 +207,15 @@ int main() {
   // Plane with the texture
   Mesh mesh(vertices, indices, textures);
   // Normal map for the plane
-  Texture normalMap((normalPath).c_str(), "normal", 1);
+  Texture normalMap((normalPath).c_str(), "normal", 10);
 
   float angle = 0.0f;
 	float s = 1.0f;
-	glm::vec3 direction = glm::vec3(1.0f, 0.0f, 0.0f);
   glm::mat4 rot = glm::mat4(1.0f);
   // Main while loop
   while (!glfwWindowShouldClose(window)) {
+    	glm::vec3 direction = glm::vec3(1.0f, 0.0f, 0.0f);
+
     // Updates counter and times
     crntTime = glfwGetTime();
     timeDiff = crntTime - prevTime;
@@ -231,6 +235,7 @@ int main() {
 
     // Bind the custom framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+  
     // Specify the color of the background
     glClearColor(pow(0.07f, gamma), pow(0.13f, gamma), pow(0.17f, gamma), 1.0f);
     // Clean the back buffer and depth buffer
@@ -250,27 +255,30 @@ int main() {
 		if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 		{
 			angle = 0.1f;
-			direction = glm::vec3(1.0f, 0.0f, 0.0f);
+			direction += glm::vec3(1.0f, 0.0f, 0.0f);
 
 		}
 		if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
 		{
+
 			angle = 0.1f;
-			direction = glm::vec3(0.0f, 1.0f, 0.0f);
+			direction += glm::vec3(0.0f, 1.0f, 0.0f);
 
 		}
 		if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
 		{
+
 			angle = 0.1f;
-			direction = glm::vec3(0.0f, 0.0f, 1.0f);
+			direction += glm::vec3(0.0f, 0.0f, 1.0f);
 
 		}
 	
-    //glm::normalize(direction);
 		
 		
 		rot = glm::rotate(rot, glm::radians(angle), direction);
     angle = 0.0f;
+    direction = glm::vec3(0.0001f, 0.0f, 0.0f);
+
 		// Draw the normal model
 		mesh.Draw(window, shaderProgram, camera, rot);//framebuffer has msaa can't do anything
 
@@ -298,8 +306,10 @@ int main() {
 
   // Delete all the objects we've created
   shaderProgram.Delete();
+  
   glDeleteFramebuffers(1, &FBO);
   glDeleteFramebuffers(1, &postProcessingFBO);
+  
   // Delete window before ending the program
   glfwDestroyWindow(window);
   // Terminate GLFW before ending the program
