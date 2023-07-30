@@ -6,6 +6,15 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+
+struct Color {
+  unsigned char r, g, b;
+};
+struct Gray {
+  unsigned char gray;
+};
+enum type_padding { zero, pixel_replication, pixel_mirroring };
+
 class ImageProcessing {
   /*
     int width, height, channels;
@@ -33,75 +42,13 @@ class ImageProcessing {
       return 1;
     }
   */
-  struct Color {
-    unsigned char r, g, b;
-  };
-  struct Gray {
-    unsigned char gray;
-  };
-
 private:
-  std::vector<Gray> rgbToGray(unsigned char *diffuse_data, int width, int height) {
-    std::vector<Color> diffuse_map(width * height);
-    for (int i = 0; i < width * height; i++) {
-      diffuse_map[i].r = diffuse_data[i * 3];
-      diffuse_map[i].g = diffuse_data[i * 3 + 1];
-      diffuse_map[i].b = diffuse_data[i * 3 + 2];
-    }
-    std::vector<Gray> gray_img(width * height);
-    int index_gray = 0;
-    for (int i = 0; i < height; i++) {
-      for (int j = 0; j < width; j++) {
-        // 0.299 ∙ Red + 0.587 ∙ Green + 0.114 ∙ Blue
-        int index = j + width * i;
-        gray_img[index].gray = 0.299f * diffuse_map[index].r + 0.587f * diffuse_map[index].g + 0.114f * diffuse_map[index].b;
-      }
-    }
-    // std::cout << index_write << " out of " << widthImg * heightImg<<std::endl;
-    return gray_img;
-  }
+  std::vector<Gray> rgbToGray(unsigned char *diffuse_data, int width, int height);
+  std::vector<Gray> apply_padding_to_image(std::vector<Gray> img, const int kernel_size, type_padding padding,int height,int width);
   // Function to compute the normal map
 public:
-  ImageProcessing(){};
-
-  int compute_normal_map(std::string diffusePath, double strength) {
-    int width, height, channels;
-    unsigned char *diffuse_data = stbi_load(diffusePath.c_str(), &width, &height, &channels, 3);
-    std::vector<Color> normal_map(width * height);
-    std::vector<Gray> map = rgbToGray(diffuse_data, width, height);
-    for (int y = 1; y < height - 1; y++) {
-      for (int x = 1; x < width - 1; x++) {
-        // Calculate gradients in the x and y directions
-        int gx = (map[(y - 1) * width + (x + 1)].gray + 2 * map[y * width + (x + 1)].gray + map[(y + 1) * width + (x + 1)].gray) -
-                 (map[(y - 1) * width + (x - 1)].gray + 2 * map[y * width + (x - 1)].gray + map[(y + 1) * width + (x - 1)].gray);
-
-        int gy = (map[(y + 1) * width + (x - 1)].gray + 2 * map[(y + 1) * width + x].gray + map[(y + 1) * width + (x + 1)].gray) -
-                 (map[(y - 1) * width + (x - 1)].gray + 2 * map[(y - 1) * width + x].gray + map[(y - 1) * width + (x + 1)].gray);
-
-        // Calculate the normal vector
-        double length = std::sqrt(gx * gx + gy * gy + 255 * 255); // 255 is the depth range (maximum intensity value) [gx,gy,255]
-        double nx = -gx * strength / length;
-        double ny = -gy * strength / length;
-        double nz = 1.0;
-
-        // Normalize the normal vector
-        double norm = std::sqrt(nx * nx + ny * ny + nz * nz);
-        nx /= norm;
-        ny /= norm;
-        nz /= norm;
-
-        // Convert the normal vector to RGB values
-        normal_map[y * width + x].r = static_cast<unsigned char>((nx + 1.0) * 0.5 * 255);
-        normal_map[y * width + x].g = static_cast<unsigned char>((ny + 1.0) * 0.5 * 255);
-        normal_map[y * width + x].b = static_cast<unsigned char>((nz + 1.0) * 0.5 * 255);
-      }
-    }
-    if (!stbi_write_png("textures/normal_map.png", width, height, 3, normal_map.data(), width * 3)) {
-      std::cout << "Failed to write the image." << std::endl;
-      return 1;
-    } else
-      return 0;
-  }
+  ImageProcessing();
+  int compute_normal_map(std::string diffusePath, double strength);
 };
 
 #endif
