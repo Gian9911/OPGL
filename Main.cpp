@@ -6,8 +6,7 @@ const unsigned int height = 1600;
 // Number of samples per pixel for MSAA
 unsigned int samples = 8;
 
-// Controls the gamma function
-float gamma = 2.2f;
+
 
 float rectangleVertices[] = {
     //  Coords   // texCoords
@@ -58,6 +57,8 @@ std::vector<Vertex> vertices = {
 std::vector<GLuint> indices = {0, 1, 2, 0, 2, 3, 4, 7, 6, 4, 6, 5, 11, 10, 9, 11, 9, 8, 12, 13, 14, 12, 14, 15, 16, 17, 19, 19, 18, 16, 23, 21, 20, 20, 22, 23};
 
 int main() {
+  // Controls the gamma function
+  float gamma = 2.2f;
   // Initialize GLFW
   glfwInit();
 
@@ -90,7 +91,9 @@ int main() {
 
   // Generates shaders
   Shader shaderProgram("default.vert", "default.frag", "default.geom");
+  
   Shader framebufferProgram("framebuffer.vert", "framebuffer.frag");
+  
 
   // Take care of all the light related things
   glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -99,6 +102,7 @@ int main() {
   shaderProgram.Activate();
   glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
   glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+  
   framebufferProgram.Activate();
   glUniform1i(glGetUniformLocation(framebufferProgram.ID, "screenTexture"), 0);
   glUniform1f(glGetUniformLocation(framebufferProgram.ID, "gamma"), gamma);
@@ -117,7 +121,7 @@ int main() {
   glFrontFace(GL_CCW);
 
   // Creates camera object
-  Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
+  Camera camera(width, height, glm::vec3(0.0f, 0.5f, 6.0f));
 
   // Prepare framebuffer rectangle VBO and VAO
   unsigned int rectVAO, rectVBO;
@@ -192,7 +196,7 @@ int main() {
 
   // Paths to textures
 
-  std::string diffusePath = "textures/texture_legno.png";
+  std::string diffusePath = "textures/diffuse.png";
   // Crea normal in textrues/normal_map.png"
   ImageProcessing ip;
   ip.compute_normal_map(diffusePath, 1);
@@ -203,10 +207,15 @@ int main() {
   // Plane with the texture
   Mesh mesh(vertices, indices, textures);
   // Normal map for the plane
-  Texture normalMap((normalPath).c_str(), "normal", 1);
+  Texture normalMap((normalPath).c_str(), "normal", 10);
 
+  float angle = 0.0f;
+	float s = 1.0f;
+  glm::mat4 rot = glm::mat4(1.0f);
   // Main while loop
   while (!glfwWindowShouldClose(window)) {
+    	glm::vec3 direction = glm::vec3(1.0f, 0.0f, 0.0f);
+
     // Updates counter and times
     crntTime = glfwGetTime();
     timeDiff = crntTime - prevTime;
@@ -226,6 +235,7 @@ int main() {
 
     // Bind the custom framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+  
     // Specify the color of the background
     glClearColor(pow(0.07f, gamma), pow(0.13f, gamma), pow(0.17f, gamma), 1.0f);
     // Clean the back buffer and depth buffer
@@ -241,8 +251,37 @@ int main() {
     // normalMap.Bind();
     glUniform1i(glGetUniformLocation(shaderProgram.ID, "normal0"), 1);
 
-    // Draw the normal model
-    mesh.Draw(shaderProgram, camera);
+    
+		if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+		{
+			angle = 0.1f;
+			direction += glm::vec3(1.0f, 0.0f, 0.0f);
+
+		}
+		if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
+		{
+
+			angle = 0.1f;
+			direction += glm::vec3(0.0f, 1.0f, 0.0f);
+
+		}
+		if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+		{
+
+			angle = 0.1f;
+			direction += glm::vec3(0.0f, 0.0f, 1.0f);
+
+		}
+	
+		
+		
+		rot = glm::rotate(rot, glm::radians(angle), direction);
+    angle = 0.0f;
+    direction = glm::vec3(0.0001f, 0.0f, 0.0f);
+
+		// Draw the normal model
+		mesh.Draw(window, shaderProgram, camera, rot);//framebuffer has msaa can't do anything
+
 
     // Make it so the multisampling FBO is read while the post-processing FBO is drawn
     glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
@@ -267,8 +306,10 @@ int main() {
 
   // Delete all the objects we've created
   shaderProgram.Delete();
+  
   glDeleteFramebuffers(1, &FBO);
   glDeleteFramebuffers(1, &postProcessingFBO);
+  
   // Delete window before ending the program
   glfwDestroyWindow(window);
   // Terminate GLFW before ending the program
