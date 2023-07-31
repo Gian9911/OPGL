@@ -56,6 +56,49 @@ std::vector<Vertex> vertices = {
 // Indices for plane with texture
 std::vector<GLuint> indices = {0, 1, 2, 0, 2, 3, 4, 7, 6, 4, 6, 5, 11, 10, 9, 11, 9, 8, 12, 13, 14, 12, 14, 15, 16, 17, 19, 19, 18, 16, 23, 21, 20, 20, 22, 23};
 
+
+// Vertices for plane with texture
+std::vector<Vertex> lightVertertices = {
+    // Faccia inferiore del cubo
+    Vertex{glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+    Vertex{glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
+    Vertex{glm::vec3(1.0f, -1.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
+    Vertex{glm::vec3(1.0f, -1.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},
+
+    // Faccia superiore del cubo
+    Vertex{glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+    Vertex{glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
+    Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
+    Vertex{glm::vec3(1.0f, 1.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},
+
+    // Faccia sinistra del cubo
+    Vertex{glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+    Vertex{glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
+    Vertex{glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
+    Vertex{glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},
+
+    // Faccia destra del cubo 2-6-7-3 - 12-13-14-15
+    Vertex{glm::vec3(1.0f, -1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+    Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},
+    Vertex{glm::vec3(1.0f, 1.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
+    Vertex{glm::vec3(1.0f, -1.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
+
+    // Faccia frontale del cubo 5,6,1,2, - 16,17,18,19
+    Vertex{glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},
+    Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
+    Vertex{glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+    Vertex{glm::vec3(1.0f, -1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
+
+    // Faccia dietro del cubo 4,7,0,3 - 20,21,22,23
+    Vertex{glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},
+    Vertex{glm::vec3(1.0f, 1.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
+    Vertex{glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
+    Vertex{glm::vec3(1.0f, -1.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
+
+};
+// Indices for plane with texture
+std::vector<GLuint> lightIndices = {0, 1, 2, 0, 2, 3, 4, 7, 6, 4, 6, 5, 11, 10, 9, 11, 9, 8, 12, 13, 14, 12, 14, 15, 16, 17, 19, 19, 18, 16, 23, 21, 20, 20, 22, 23};
+
 int main() {
   // Controls the gamma function
   float gamma = 2.2f;
@@ -91,13 +134,16 @@ int main() {
 
   // Generates shaders
   Shader shaderProgram("default.vert", "default.frag", "default.geom");
-  
+  Shader lightShader("light.vert", "light.frag");
   Shader framebufferProgram("framebuffer.vert", "framebuffer.frag");
   
 
   // Take care of all the light related things
   glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-  glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+  glm::vec3 lightPos = glm::vec3(0.5f, 1.5f, 0.5f);
+  glm::mat4 lightModel = glm::mat4(1.0f);
+	lightModel = glm::translate(lightModel, lightPos);
+  
 
   shaderProgram.Activate();
   glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
@@ -106,6 +152,10 @@ int main() {
   framebufferProgram.Activate();
   glUniform1i(glGetUniformLocation(framebufferProgram.ID, "screenTexture"), 0);
   glUniform1f(glGetUniformLocation(framebufferProgram.ID, "gamma"), gamma);
+
+  lightShader.Activate();
+  glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 
   // Enables the Depth Buffer
   glEnable(GL_DEPTH_TEST);
@@ -203,9 +253,11 @@ int main() {
   std::string normalPath = "textures/normal_map.png";
 
   std::vector<Texture> textures = {Texture((diffusePath).c_str(), "diffuse", 0)};
+  std::vector<Texture> textures2 = {};
 
   // Plane with the texture
   Mesh mesh(vertices, indices, textures);
+  Mesh lightMesh(lightVertertices, lightIndices, textures2);
   // Normal map for the plane
   Texture normalMap((normalPath).c_str(), "normal", 10);
 
@@ -281,6 +333,8 @@ int main() {
 
 		// Draw the normal model
 		mesh.Draw(window, shaderProgram, camera, rot);//framebuffer has msaa can't do anything
+    mesh.Draw(window, shaderProgram, camera,glm::quat(1.0f, 0.0f, 0.0f, 0.0f),glm::vec3(0.54f),lightModel, glm::vec3(1.0f));//framebuffer has msaa can't do anything
+
 
 
     // Make it so the multisampling FBO is read while the post-processing FBO is drawn
