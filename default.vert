@@ -39,7 +39,7 @@ vec4 objPos = vec4(aPos, 1.0f);
 void main()
 {
 	gl_Position = model * translation * rotation * scale * objPos;
-	objPos = gl_Position;
+	//objPos = gl_Position;
 	data_out.Normal = aNormal;
 	data_out.color = aColor;
 	data_out.texCoord = aTex;

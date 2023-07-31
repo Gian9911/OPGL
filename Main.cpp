@@ -140,9 +140,9 @@ int main() {
 
   // Take care of all the light related things
   glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-  glm::vec3 lightPos = glm::vec3(0.5f, 1.5f, 0.5f);
-  glm::mat4 lightModel = glm::mat4(1.0f);
-	lightModel = glm::translate(lightModel, lightPos);
+  glm::vec3 lightPos = glm::vec3(0.0f, 0.5f, 0.0f);
+  //glm::mat4 lightModel = glm::mat4(1.0f);
+	//lightModel = glm::translate(lightModel, lightPos);
   
 
   shaderProgram.Activate();
@@ -153,9 +153,6 @@ int main() {
   glUniform1i(glGetUniformLocation(framebufferProgram.ID, "screenTexture"), 0);
   glUniform1f(glGetUniformLocation(framebufferProgram.ID, "gamma"), gamma);
 
-  lightShader.Activate();
-  glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
-	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 
   // Enables the Depth Buffer
   glEnable(GL_DEPTH_TEST);
@@ -263,6 +260,7 @@ int main() {
 
   float angle = 0.0f;
 	float s = 1.0f;
+  glm::vec3 tr = glm::vec3(0.0f, 0.0f, 0.0f);
   glm::mat4 rot = glm::mat4(1.0f);
   // Main while loop
   while (!glfwWindowShouldClose(window)) {
@@ -303,7 +301,7 @@ int main() {
     // normalMap.Bind();
     glUniform1i(glGetUniformLocation(shaderProgram.ID, "normal0"), 1);
 
-    
+/*    //rotation
 		if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 		{
 			angle = 0.1f;
@@ -325,17 +323,37 @@ int main() {
 
 		}
 	
-		
+		//translation
+    		if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+		{
+			angle = 0.1f;
+      rot = glm::rotate(rot, glm::radians(angle), glm::vec3(1.0f,0.0f,0.0f));
+
+		}
+		if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
+		{
+
+			angle = 0.1f;
+			rot = glm::rotate(rot, glm::radians(angle), glm::vec3(0.0f,1.0f,0.0f));
+
+		}
+		if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+		{
+
+			angle = 0.1f;
+			rot = glm::rotate(rot, glm::radians(angle), glm::vec3(0.0f,0.0f,1.0f));
+
+    }
 		
 		//rot = glm::rotate(rot, glm::radians(angle), direction);
     angle = 0.0f;
     direction = glm::vec3(0.0001f, 0.0f, 0.0f);
 
 		// Draw the normal model
-		mesh.Draw(window, shaderProgram, camera, rot);//framebuffer has msaa can't do anything
-    mesh.Draw(window, shaderProgram, camera,glm::quat(1.0f, 0.0f, 0.0f, 0.0f),glm::vec3(0.54f),lightModel, glm::vec3(1.0f));//framebuffer has msaa can't do anything
-
-
+		mesh.Draw(window, shaderProgram, camera, rot);//framebuffer has msaa can't do anything"
+    //lightMesh.Draw(window, lightShader, camera,glm::quat(1.0f, 0.0f, 0.0f, 0.0f),glm::vec3(0.001f),lightModel, glm::vec3(1.0f));//framebuffer has msaa can't do anything
+*/
+    mesh.DrawAssistant(mesh, window, shaderProgram, camera);
 
     // Make it so the multisampling FBO is read while the post-processing FBO is drawn
     glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);

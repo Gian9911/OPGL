@@ -51,7 +51,7 @@ void main()
 
 
     gl_Position = data_in[0].projection * gl_in[0].gl_Position;
-    Normal = data_in[0].Normal;
+    Normal = N;
     color = data_in[0].color;
     texCoord = data_in[0].texCoord;
     // Change all lighting variables to TBN space
@@ -61,7 +61,7 @@ void main()
     EmitVertex();
 
     gl_Position = data_in[1].projection * gl_in[1].gl_Position;
-    Normal = data_in[1].Normal;
+    Normal = N;
     color = data_in[1].color;
     texCoord = data_in[1].texCoord;
     // Change all lighting variables to TBN space
@@ -71,7 +71,7 @@ void main()
     EmitVertex();
 
     gl_Position = data_in[2].projection * gl_in[2].gl_Position;
-    Normal = data_in[2].Normal;
+    Normal = N;
     color = data_in[2].color;
     texCoord = data_in[2].texCoord;
     // Change all lighting variables to TBN space
