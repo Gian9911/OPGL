@@ -214,7 +214,7 @@ int main() {
   glm::mat4 rot = glm::mat4(1.0f);
   // Main while loop
   while (!glfwWindowShouldClose(window)) {
-    	glm::vec3 direction = glm::vec3(1.0f, 0.0f, 0.0f);
+    	glm::vec3 direction = glm::vec3(1.0f);
 
     // Updates counter and times
     crntTime = glfwGetTime();
@@ -255,27 +255,27 @@ int main() {
 		if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 		{
 			angle = 0.1f;
-			direction += glm::vec3(1.0f, 0.0f, 0.0f);
+      rot = glm::rotate(rot, glm::radians(angle), glm::vec3(1.0f,0.0f,0.0f));
 
 		}
 		if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
 		{
 
 			angle = 0.1f;
-			direction += glm::vec3(0.0f, 1.0f, 0.0f);
+			rot = glm::rotate(rot, glm::radians(angle), glm::vec3(0.0f,1.0f,0.0f));
 
 		}
 		if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
 		{
 
 			angle = 0.1f;
-			direction += glm::vec3(0.0f, 0.0f, 1.0f);
+			rot = glm::rotate(rot, glm::radians(angle), glm::vec3(0.0f,0.0f,1.0f));
 
 		}
 	
 		
 		
-		rot = glm::rotate(rot, glm::radians(angle), direction);
+		//rot = glm::rotate(rot, glm::radians(angle), direction);
     angle = 0.0f;
     direction = glm::vec3(0.0001f, 0.0f, 0.0f);
 
