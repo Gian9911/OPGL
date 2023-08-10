@@ -66,7 +66,7 @@ void Mesh::Draw(
 	glm::mat4 sca = glm::mat4(1.0f);
 
 	// Transform the matrices to their correct form
-	// trans = glm::translate(trans, translation);
+	trans = glm::translate(trans, translation);
 	rot = glm::mat4_cast(rotation);
 	sca = glm::scale(sca, glm::vec3(s));
 
@@ -91,21 +91,36 @@ void Mesh::DrawAssistant(
 	{
 		s += 0.001f;
 	}
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+	{
+		s -= 0.001f;
+	}
     // translation
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		translation += glm::vec3(0.01f, 0.0f, 0.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	{
+		translation -= glm::vec3(0.01f, 0.0f, 0.0f);
+	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
-		translation += glm::vec3(0.0f, 0.0f, -1.0f);
+		translation += glm::vec3(0.0f, 0.0f, 0.01f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
-
-		translation += glm::vec3(0.0f, 1.0f, 0.0f);
+		translation -= glm::vec3(0.0f, 0.0f, 0.01f);
 	}
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
 	{
-
-		translation += glm::vec3(1.0f, 0.0f, 0.0f);
+		translation += glm::vec3(0.0f, 0.01f, 0.0f);
 	}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
+	{
+		translation -= glm::vec3(0.0f, 0.01f, 0.0f);
+	}
+	
 	// rotation
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 	{
@@ -124,27 +139,25 @@ void Mesh::DrawAssistant(
 		angle = 0.1f;
 		rot = glm::rotate(rot, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
-
-	// translation
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+		if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
 	{
-		angle = 0.1f;
+		angle = -0.1f;
 		rot = glm::rotate(rot, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
-	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 	{
 
-		angle = 0.1f;
+		angle = -0.1f;
 		rot = glm::rotate(rot, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 	{
 
-		angle = 0.1f;
+		angle = -0.1f;
 		rot = glm::rotate(rot, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
 
-	// rot = glm::rotate(rot, glm::radians(angle), direction);
+
 	angle = 0.0f;
 	direction = glm::vec3(0.0001f, 0.0f, 0.0f);
 
