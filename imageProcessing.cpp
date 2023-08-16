@@ -85,6 +85,20 @@ std::vector<Gray> ImageProcessing::apply_padding_to_image(std::vector<Gray> img,
   return padded_img_matrix;
 }
 
+int ImageProcessing::compute_specular_map(std::string diffusePath) {
+  int width, height, channels;
+  unsigned char *diffuse_data = stbi_load(diffusePath.c_str(), &width, &height, &channels, 3);
+  std::vector<Gray> specular_map;
+  std::vector<Gray> map = apply_padding_to_image(rgbToGray(diffuse_data, width, height), 3, pixel_mirroring, height, width);
+  specular_map = edge_detection(map, height, width);
+  specular_map = inversion_value(specular_map, height, width);
+  if (!stbi_write_png("textures/specular_map.png", width, height, 1, specular_map.data(), width)) {
+    std::cout << "Failed to write the image." << std::endl;
+    return 1;
+  } else {
+    return 0;
+  }
+}
 int ImageProcessing::compute_normal_map(std::string diffusePath, double strength) {
   int width, height, channels;
   unsigned char *diffuse_data = stbi_load(diffusePath.c_str(), &width, &height, &channels, 3);
@@ -126,4 +140,31 @@ int ImageProcessing::compute_normal_map(std::string diffusePath, double strength
     return 1;
   } else
     return 0;
+}
+// image already padded!
+std::vector<Gray> ImageProcessing::edge_detection(std::vector<Gray> map, int height, int width) {
+  std::vector<Gray> sobel_image(height * width);
+  for (int y = 1; y < height - 1; y++) {
+    for (int x = 1; x < width - 1; x++) {
+      int gx = (map[(y - 1) * (width + 2) + (x + 1)].gray + 2 * map[y * (width + 2) + (x + 1)].gray + map[(y + 1) * (width + 2) + (x + 1)].gray) -
+               (map[(y - 1) * (width + 2) + (x - 1)].gray + 2 * map[y * (width + 2) + (x - 1)].gray + map[(y + 1) * (width + 2) + (x - 1)].gray);
+
+      int gy = (map[(y + 1) * (width + 2) + (x - 1)].gray + 2 * map[(y + 1) * (width + 2) + x].gray + map[(y + 1) * (width + 2) + (x + 1)].gray) -
+               (map[(y - 1) * (width + 2) + (x - 1)].gray + 2 * map[(y - 1) * (width + 2) + x].gray + map[(y - 1) * (width + 2) + (x + 1)].gray);
+      double value = sqrt(gx * gx + gy * gy);
+      sobel_image[(y - 1) * width + (x - 1)].gray = value > 255 ? 255 : value;
+    }
+  }
+  if (!stbi_write_png("textures/sobel_image.png", width, height, 1, sobel_image.data(), width))
+    std::cout << "Failed to write the image." << std::endl;
+  return sobel_image;
+}
+std::vector<Gray> ImageProcessing::inversion_value(std::vector<Gray> grey_map, int height, int width) {
+  std::vector<Gray> image(width*height);
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width ; x++) {
+      image[(y) * width + (x)].gray = 255 - grey_map[(y) * width + (x)].gray;
+    }
+  }
+  return image;
 }

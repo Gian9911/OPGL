@@ -49,6 +49,9 @@ private:
 public:
   ImageProcessing();
   int compute_normal_map(std::string diffusePath, double strength);
+  int compute_specular_map(std::string diffusePath);
+  std::vector<Gray> edge_detection(std::vector<Gray> grey_map,int height,int width);
+  std::vector<Gray> inversion_value(std::vector<Gray> grey_map,int height,int width);
 };
 
 #endif

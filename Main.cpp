@@ -10,13 +10,15 @@ unsigned int samples = 8;
 
 float rectangleVertices[] = {
     //  Coords   // texCoords
-    1.0f, -1.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f,
-
-    1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  -1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f};
+    1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 
+    -1.0f, 0.0f, 0.0f, -1.0f, 1.0f,
+    0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+    -1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f};
 
 // Vertices for plane with texture
 std::vector<Vertex> vertices = {
-    // Faccia inferiore del cubo
+    // Faccia inferiore del cubo  
+    // coords,normal,color,tex_coords
     Vertex{glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
     Vertex{glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
     Vertex{glm::vec3(1.0f, -1.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
@@ -247,6 +249,7 @@ int main() {
   // Crea normal in textrues/normal_map.png"
   ImageProcessing ip;
   ip.compute_normal_map(diffusePath, 1);
+  ip.compute_specular_map(diffusePath);
   std::string normalPath = "textures/normal_map.png";
 
   std::vector<Texture> textures = {Texture((diffusePath).c_str(), "diffuse", 0)};
