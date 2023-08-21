@@ -11,7 +11,7 @@ set(H_DIR  ${CMAKE_SOURCE_DIR}/Libraries/include)
 set(LIBRARY_FOLDER ${CMAKE_SOURCE_DIR}/Libraries/lib)
 # set(GLAD_FOLDER ${CMAKE_SOURCE_DIR}/Libraries/include/glad/glad.c)
 link_directories(${LIBRARY_FOLDER})
-file(GLOB SOURCES "*.cpp" "*.h" "*.c")
+file(GLOB SOURCES "*.cpp" "*.h" "*.c" "*.txt")
 add_executable(YoutubeOpenG ${SOURCES}) 
 # stb.cpp Texture.cpp Texture.h VAO.cpp VAO.h VBO.cpp VBO.h glad.c)
 
@@ -47,6 +47,11 @@ add_custom_target(Textures ALL
     ${PROJECT_SOURCE_DIR}/textures
     ${PROJECT_BINARY_DIR}/textures
     COMMENT "Copying texture"
+)
+add_custom_command(
+    TARGET copy_files POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/vert.txt ${PROJECT_BINARY_DIR}
 )
 add_dependencies(YoutubeOpenG ModelFiles Textures)
 target_link_libraries(YoutubeOpenG PRIVATE -lglfw3 -lglew32s -lopengl32 -lgdi32)

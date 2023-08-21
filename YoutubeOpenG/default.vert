@@ -21,8 +21,8 @@ out vec3 crntPos;
 
 // Inputs the matrices needed for 3D viewing with perspective
 uniform mat4 modelrot;
-//uniform mat4 view;
-//uniform mat4 proj;
+uniform mat4 view;
+uniform mat4 proj;
 uniform mat4 camMatrix;
 uniform mat4 model;
 

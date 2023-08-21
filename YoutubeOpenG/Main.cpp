@@ -10,19 +10,22 @@ namespace fs = std::filesystem;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <fstream>
+#include <vector>
 
 #include "Texture.h"
 #include "shaderClass.h"
 #include "VAO.h"
 #include "VBO.h"
 #include "Camera.h"
+#include "imageProcessing.h"
 #include "EBO.h"
 
-const unsigned int width = 800;
-const unsigned int height = 800;
+const unsigned int width = 1500;
+const unsigned int height = 1500;
 
 // Vertices coordinates
-GLfloat vertices[] =
+GLfloat Pvertices[] =
 	{
 		//     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
 		-0.5f, 0.0f, 0.5f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,	// Bottom side
@@ -46,9 +49,48 @@ GLfloat vertices[] =
 		-0.5f, 0.0f, 0.5f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.0f, 0.5f, 0.8f, // Facing side
 		0.0f, 0.8f, 0.0f, 0.92f, 0.86f, 0.76f, 2.5f, 5.0f, 0.0f, 0.5f, 0.8f	  // Facing side
 };
+// Vertices coordinates
+GLfloat vertices[] =
+	{
+		//     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
+		-0.25f, -0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.0f, -0.25f, 0.0f,	// Bottom side
+		-0.25f, -0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.25f, 0.0f, -0.25f, 0.0f, // Bottom side
+		0.25f, -0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.25f, 0.0f, -0.25f, 0.0f,	// Bottom side
+		0.25f, -0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.0f, 0.0f, -0.25f, 0.0f,	// Bottom side
+
+		-0.25f, 0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.0f, 0.25f, 0.0f,	// up Side
+		-0.25f, 0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.25f, 0.0f, 0.25f, 0.0f, // up Side
+		0.25f, 0.25f, 0.25f, 0.92f, 0.86f, 0.76f, 0.25f, 0.25f, 0.0f, 0.25f, 0.0f,	// up Side
+		0.25f, 0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.25f, 0.0f, 0.0f, 0.25f, 0.0f,	// up Side
+
+
+		-0.25f, -0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, -0.25f, 0.0f, 0.0f, // left side
+		-0.25f, -0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.25f, -0.25f, 0.0f, 0.0f,	// left side
+		-0.25f, 0.25f, 0.25f, 0.92f, 0.86f, 0.76f, 0.25f, 0.25f, -0.25f, 0.0f, 0.0f,	// left side
+		-0.25f, 0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.25f, 0.0f, -0.25f, 0.0f, 0.0f,	// Left Side
+
+
+		0.25f, -0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.25f, 0.0f, 0.0f, // Right side
+		0.25f, 0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.0f, 0.25f, 0.0f, 0.0f,  // Right side
+		0.25f, 0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.25f, 0.25f, 0.25f, 0.0f, 0.0f,  // Right side
+		0.25f, -0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.0f, 0.25f, 0.25f, 0.0f, 0.0f,	// Right Side
+
+
+		-0.25f, 0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.0f, 0.0f, 0.0f, 0.25f,  // Facing side
+		0.25f, 0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.25f, 0.0f, 0.0f, 0.25f, // Facing side
+		-0.25f, -0.25f, 0.25f, 0.92f, 0.86f, 0.76f, 0.0f, 0.0f, 0.0f, 0.0f, 0.25f,	  // Facing side
+		0.25f, -0.25f, 0.25f, 0.92f, 0.86f, 0.76f, 0.0f, 0.25f, 0.0f, 0.0f, 0.25f,	// Facing Side
+		
+		-0.25f, 0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.0f, 0.0f, 0.0f, -0.25f,  // -Facing side
+		0.25f, 0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.25f, 0.0f, 0.0f, -0.25f, // -Facing side
+		-0.25f, -0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.0f, 0.0f, 0.0f, 0.0f, -0.25f,	  // -Facing side
+		0.25f, -0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.0f, 0.25f, 0.0f, 0.0f, -0.25f,	// -Facing Side
+	};
+GLuint indices[] =
+	{0, 1, 2, 0, 2, 3, 4, 7, 6, 4, 6, 5, 11, 10, 9, 11, 9, 8, 12, 13, 14, 12, 14, 15, 16, 17, 19, 19, 18, 16, 23, 21, 20, 20, 22, 23};
 
 // Indices for vertices order
-GLuint indices[] =
+GLuint Pindices[] =
 	{
 		0, 1, 2,	// Bottom side
 		0, 2, 3,	// Bottom side
@@ -86,6 +128,35 @@ GLuint lightIndices[] =
 
 int main()
 {
+
+
+/*
+     const int MAX_SIZE = 100; // Numero massimo di elementi nell'array
+    GLfloat vertices[MAX_SIZE];
+    GLuint arraySize = 0;
+
+    std::ifstream inputFile("vert.txt"); // Sostituisci "file.txt" con il percorso del tuo file di testo
+
+    if (!inputFile.is_open()) {
+        std::cerr << "Impossibile aprire il file." << std::endl;
+        return 1;
+    }
+
+    GLfloat intValue;
+    while (inputFile >> intValue && arraySize < MAX_SIZE) {
+        vertices[arraySize] = intValue;
+        arraySize++;
+    }
+
+    inputFile.close();
+
+    // Ora vertices contiene i numeri interi letti dal file
+    for (int i = 0; i < arraySize; i++) {
+        std::cout << vertices[i] << " ";
+    }
+
+
+*/
 	// Initialize GLFW
 	glfwInit();
 
@@ -118,11 +189,11 @@ int main()
 	// Generates Shader object using shaders default.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
 
-	// Generates Vertex Array Object and binds it
+	// Generates vertices Array Object and binds it
 	VAO VAO1;
 	VAO1.Bind();
 
-	// Generates Vertex Buffer Object and links it to vertices
+	// Generates vertices Buffer Object and links it to vertices
 	VBO VBO1(vertices, sizeof(vertices));
 	// Generates Element Buffer Object and links it to indices
 	EBO EBO1(indices, sizeof(indices));
@@ -139,10 +210,10 @@ int main()
 
 	// Shader for light cube
 	Shader lightShader("light.vert", "light.frag");
-	// Generates Vertex Array Object and binds it
+	// Generates vertices Array Object and binds it
 	VAO lightVAO;
 	lightVAO.Bind();
-	// Generates Vertex Buffer Object and links it to vertices
+	// Generates vertices Buffer Object and links it to vertices
 	VBO lightVBO(lightVertices, sizeof(lightVertices));
 	// Generates Element Buffer Object and links it to indices
 	EBO lightEBO(lightIndices, sizeof(lightIndices));
@@ -176,6 +247,15 @@ int main()
 	Texture brickTex("textures/planks.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	brickTex.texUnit(shaderProgram, "tex0", 0);
 
+	std::string diffusePath = "textures/planks.png";
+  // Crea normal in textrues/normal_map.png"
+  ImageProcessing ip;
+  ip.compute_normal_map(diffusePath, 1);
+  std::string normalPath = "textures/normal_map.png";
+
+  //std::vector<Texture> textures = {Texture((diffusePath).c_str(), "diffuse", 0)};
+
+
 	// Variables that help the rotation of the pyramid
 	float rotation = 0.0f;
 	double prevTime = glfwGetTime();
@@ -205,23 +285,23 @@ int main()
 
 		// Initializes matrices so they are not the null matrix
 		glm::mat4 model = glm::mat4(1.0f);
-		//glm::mat4 view = glm::mat4(1.0f);
-		//glm::mat4 proj = glm::mat4(1.0f);
+		glm::mat4 view = glm::mat4(1.0f);
+		glm::mat4 proj = glm::mat4(1.0f);
 
 		// Assigns different transformations to each matrix
 		model = glm::rotate(model, glm::radians(rotation), glm::vec3(1.0f, 0.0f, 0.0f));
-		// view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
-		// proj = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+		view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
+		proj = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
 
-		// Outputs the matrices into the Vertex Shader
+		// Outputs the matrices into the vertices Shader
 		int modelLoc = glGetUniformLocation(shaderProgram.ID, "modelrot");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		/*
+		
 		int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		int projLoc = glGetUniformLocation(shaderProgram.ID, "proj");
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
-*/
+
 		// Assigns a value to the uniform; NOTE: Must always be done after activating the Shader Program
 		// glUniform1f(uniID, 0.5f);
 		// Binds texture so that is appears in rendering
@@ -231,7 +311,7 @@ int main()
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
 		// Tells OpenGL which Shader Program we want to use
 		lightShader.Activate();
-		// Export the camMatrix to the Vertex Shader of the light cube
+		// Export the camMatrix to the vertices Shader of the light cube
 		camera.Matrix(lightShader, "camMatrix");
 		// Bind the VAO so OpenGL knows to use it
 		lightVAO.Bind();

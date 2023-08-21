@@ -22,6 +22,7 @@ uniform vec3 lightPos;
 // Gets the position of the camera from the main function
 uniform vec3 camPos;
 uniform mat4 modelrot;
+uniform mat4 camMatrix;
 
 void main()
 {
@@ -37,7 +38,7 @@ void main()
     	if (diffuse != 0.0f)
     	{
         	float specularLight = 0.50f;
-        	vec3 viewDirection = normalize(camPos - vec3(modelrot * vec4(crntPos,1.0f)));
+        	vec3 viewDirection = normalize(camPos - vec3(camMatrix * vec4(crntPos,1.0f)));
         	vec3 reflectionDirection = reflect(-lightDirection, normalize(Normal));
         	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 8);
         	specular = specAmount * specularLight;
