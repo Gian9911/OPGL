@@ -1,344 +1,341 @@
-//------- Ignore this ----------
-#include <filesystem>
-namespace fs = std::filesystem;
-//------------------------------
+// //------- Ignore this ----------
+// #include <filesystem>
+// namespace fs = std::filesystem;
+// //------------------------------
 
-#include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <stb/stb_image.h>
+#include <fstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <fstream>
+#include <iostream>
+#include <stb/stb_image.h>
 #include <vector>
 
+#include "Camera.h"
+#include "EBO.h"
 #include "Texture.h"
-#include "shaderClass.h"
 #include "VAO.h"
 #include "VBO.h"
-#include "Camera.h"
 #include "imageProcessing.h"
-#include "EBO.h"
+#include "shaderClass.h"
 
-const unsigned int width = 1500;
-const unsigned int height = 1500;
+#include "Mesh.h"
+const unsigned int width = 1900;
+const unsigned int height = 1200;
 
-// Vertices coordinates
-GLfloat Pvertices[] =
-	{
-		//     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
-		-0.5f, 0.0f, 0.5f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,	// Bottom side
-		-0.5f, 0.0f, -0.5f, 0.83f, 0.70f, 0.44f, 0.0f, 5.0f, 0.0f, -1.0f, 0.0f, // Bottom side
-		0.5f, 0.0f, -0.5f, 0.83f, 0.70f, 0.44f, 5.0f, 5.0f, 0.0f, -1.0f, 0.0f,	// Bottom side
-		0.5f, 0.0f, 0.5f, 0.83f, 0.70f, 0.44f, 5.0f, 0.0f, 0.0f, -1.0f, 0.0f,	// Bottom side
+Vertex vertices[] = {
+    //           COORDINATES             /            TexCoord   //
+    Vertex{glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec2(0.0f, 0.0f)}, // Bottom side
+    Vertex{glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},  // Bottom side
+    Vertex{glm::vec3(1.0f, -1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},   // Bottom side
+    Vertex{glm::vec3(1.0f, -1.0f, -1.0f), glm::vec2(1.0f, 0.0f)},  // Bottom side
 
-		-0.5f, 0.0f, 0.5f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, -0.8f, 0.5f, 0.0f,	// Left Side
-		-0.5f, 0.0f, -0.5f, 0.83f, 0.70f, 0.44f, 5.0f, 0.0f, -0.8f, 0.5f, 0.0f, // Left Side
-		0.0f, 0.8f, 0.0f, 0.92f, 0.86f, 0.76f, 2.5f, 5.0f, -0.8f, 0.5f, 0.0f,	// Left Side
+    Vertex{glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec2(0.0f, 0.0f)}, // up Side
+    Vertex{glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},  // up Side
+    Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},   // up Side
+    Vertex{glm::vec3(1.0f, 1.0f, -1.0f), glm::vec2(1.0f, 0.0f)},  // up Side
 
-		-0.5f, 0.0f, -0.5f, 0.83f, 0.70f, 0.44f, 5.0f, 0.0f, 0.0f, 0.5f, -0.8f, // Non-facing side
-		0.5f, 0.0f, -0.5f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.0f, 0.5f, -0.8f,	// Non-facing side
-		0.0f, 0.8f, 0.0f, 0.92f, 0.86f, 0.76f, 2.5f, 5.0f, 0.0f, 0.5f, -0.8f,	// Non-facing side
+    Vertex{glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec2(0.0f, 0.0f)}, // left side
+    Vertex{glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},  // left side
+    Vertex{glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},   // left side
+    Vertex{glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec2(1.0f, 0.0f)},  // Left Side
 
-		0.5f, 0.0f, -0.5f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.8f, 0.5f, 0.0f, // Right side
-		0.5f, 0.0f, 0.5f, 0.83f, 0.70f, 0.44f, 5.0f, 0.0f, 0.8f, 0.5f, 0.0f,  // Right side
-		0.0f, 0.8f, 0.0f, 0.92f, 0.86f, 0.76f, 2.5f, 5.0f, 0.8f, 0.5f, 0.0f,  // Right side
+    // 12
+    Vertex{glm::vec3(1.0f, -1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},  // Right side
+    Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},   // Right side
+    Vertex{glm::vec3(1.0f, 1.0f, -1.0f), glm::vec2(1.0f, 1.0f)},  // Right side
+    Vertex{glm::vec3(1.0f, -1.0f, -1.0f), glm::vec2(0.0f, 1.0f)}, // Right Side
 
-		0.5f, 0.0f, 0.5f, 0.83f, 0.70f, 0.44f, 5.0f, 0.0f, 0.0f, 0.5f, 0.8f,  // Facing side
-		-0.5f, 0.0f, 0.5f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.0f, 0.5f, 0.8f, // Facing side
-		0.0f, 0.8f, 0.0f, 0.92f, 0.86f, 0.76f, 2.5f, 5.0f, 0.0f, 0.5f, 0.8f	  // Facing side
+    Vertex{glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},  // Facing side
+    Vertex{glm::vec3(-1.0f, -1.0f, 1.0f), glm::vec2(0.0f, 0.0f)}, // Facing side
+    Vertex{glm::vec3(1.0f, -1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},  // Facing side
+    Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},   // Facing Side
+
+    Vertex{glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec2(1.0f, 0.0f)},  // -Facing side
+    Vertex{glm::vec3(1.0f, 1.0f, -1.0f), glm::vec2(1.0f, 1.0f)},   // -Facing side
+    Vertex{glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec2(0.0f, 0.0f)}, // -Facing side
+    Vertex{glm::vec3(1.0f, -1.0f, -1.0f), glm::vec2(0.0f, 1.0f)}   // -Facing Side
 };
-// Vertices coordinates
-GLfloat vertices[] =
-	{
-		//     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
-		-0.25f, -0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.0f, -0.25f, 0.0f,	// Bottom side
-		-0.25f, -0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.25f, 0.0f, -0.25f, 0.0f, // Bottom side
-		0.25f, -0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.25f, 0.0f, -0.25f, 0.0f,	// Bottom side
-		0.25f, -0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.0f, 0.0f, -0.25f, 0.0f,	// Bottom side
+GLuint indices[] = {2,  1,  0,              //
+                    3,  2,  0,              //
+                    6,  7,  4,              //
+                    5,  6,  4,              //
+                    9,  10, 11,             //
+                    8,  9,  11,             //
+                    14, 13, 12,             //
+                    15, 14, 12,             //
+                    16, 17, 18,             //
+                    18, 19, 16,             //
+                    20, 21, 23,             //
+                    23, 22, 20};            //
+Vertex lightVertices[] = {                  //     COORDINATES     //
+    Vertex{glm::vec3(-0.1f, -0.1f, 0.1f)},  // 0 A
+    Vertex{glm::vec3(-0.1f, -0.1f, -0.1f)}, // 1 B
+    Vertex{glm::vec3(0.1f, -0.1f, -0.1f)},  // 2 C
+    Vertex{glm::vec3(0.1f, -0.1f, 0.1f)},   // 3 D
+    Vertex{glm::vec3(-0.1f, 0.1f, 0.1f)},   // 4 E
+    Vertex{glm::vec3(-0.1f, 0.1f, -0.1f)},  // 5 F
+    Vertex{glm::vec3(0.1f, 0.1f, -0.1f)},   // 6 G
+    Vertex{glm::vec3(0.1f, 0.1f, 0.1f)}};   // 7 H
 
-		-0.25f, 0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.0f, 0.25f, 0.0f,	// up Side
-		-0.25f, 0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.25f, 0.0f, 0.25f, 0.0f, // up Side
-		0.25f, 0.25f, 0.25f, 0.92f, 0.86f, 0.76f, 0.25f, 0.25f, 0.0f, 0.25f, 0.0f,	// up Side
-		0.25f, 0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.25f, 0.0f, 0.0f, 0.25f, 0.0f,	// up Side
+GLuint lightIndices[] = {2, 1, 0, 0, 3, 2, 0, 4, 7, 0, 7, 3, 3, 7, 6, 3, 6, 2, 2, 6, 5, 2, 5, 1, 1, 5, 4, 1, 4, 0, 4, 5, 6, 4, 6, 7};
+void compute_TangentBitangent() {
+  for (int i = 0; i < 36; i += 3) {
+    float edge0x = vertices[indices[i + 1]].position.x - vertices[indices[i]].position.x;
+    float edge0y = vertices[indices[i + 1]].position.y - vertices[indices[i]].position.y;
+    float edge0z = vertices[indices[i + 1]].position.z - vertices[indices[i]].position.z;
 
+    float edge1x = vertices[indices[i + 2]].position.x - vertices[indices[i]].position.x;
+    float edge1y = vertices[indices[i + 2]].position.y - vertices[indices[i]].position.y;
+    float edge1z = vertices[indices[i + 2]].position.z - vertices[indices[i]].position.z;
 
-		-0.25f, -0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, -0.25f, 0.0f, 0.0f, // left side
-		-0.25f, -0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.25f, -0.25f, 0.0f, 0.0f,	// left side
-		-0.25f, 0.25f, 0.25f, 0.92f, 0.86f, 0.76f, 0.25f, 0.25f, -0.25f, 0.0f, 0.0f,	// left side
-		-0.25f, 0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.25f, 0.0f, -0.25f, 0.0f, 0.0f,	// Left Side
+    glm::vec3 edge0 = glm::vec3(edge0x, edge0y, edge0z);
+    glm::vec3 edge1 = glm::vec3(edge1x, edge1y, edge1z);
+    glm::vec2 deltaUV0 = vertices[indices[i + 1]].texUV - vertices[indices[i]].texUV;
+    glm::vec2 deltaUV1 = vertices[indices[i + 2]].texUV - vertices[indices[i]].texUV;
 
+    // one over the determinant
+    float invDet = 1.0f / (deltaUV0.x * deltaUV1.y - deltaUV1.x * deltaUV0.y);
 
-		0.25f, -0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.0f, 0.0f, 0.25f, 0.0f, 0.0f, // Right side
-		0.25f, 0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.0f, 0.25f, 0.0f, 0.0f,  // Right side
-		0.25f, 0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.25f, 0.25f, 0.25f, 0.0f, 0.0f,  // Right side
-		0.25f, -0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.0f, 0.25f, 0.25f, 0.0f, 0.0f,	// Right Side
+    glm::vec3 tangent = glm::vec3(invDet * (deltaUV1.y * edge0 - deltaUV0.y * edge1));
+    vertices[indices[i]].tangent = tangent;
+    vertices[indices[i + 1]].tangent = tangent;
+    vertices[indices[i + 2]].tangent = tangent;
+    // std::cout << "tangent: " << vertices[indices[i]].tangent.x << "," << vertices[indices[i]].tangent.y << "," << vertices[indices[i]].tangent.z << std::endl;
+    glm::vec3 bitangent = glm::vec3(invDet * (-deltaUV1.x * edge0 + deltaUV0.x * edge1));
+    vertices[indices[i]].bitangent = bitangent;
+    vertices[indices[i + 1]].bitangent = bitangent;
+    vertices[indices[i + 2]].bitangent = bitangent;
 
+    glm::vec3 cross = glm::normalize(glm::cross(edge0, edge1));
+    vertices[indices[i]].normal = cross;
+    vertices[indices[i + 1]].normal = cross;
+    vertices[indices[i + 2]].normal = cross;
+  }
+}
+unsigned int loadTexture(char const *path) {
+  unsigned int textureID;
+  glGenTextures(1, &textureID);
+  std::cout << "TEX_"
+            << "Normal"
+            << ": " << textureID << std::endl;
+  int width, height, nrComponents;
+  unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+  if (data) {
+    GLenum format;
+    if (nrComponents == 1)
+      format = GL_RED;
+    else if (nrComponents == 3)
+      format = GL_RGB;
+    else if (nrComponents == 4)
+      format = GL_RGBA;
 
-		-0.25f, 0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.0f, 0.0f, 0.0f, 0.25f,  // Facing side
-		0.25f, 0.25f, 0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.25f, 0.0f, 0.0f, 0.25f, // Facing side
-		-0.25f, -0.25f, 0.25f, 0.92f, 0.86f, 0.76f, 0.0f, 0.0f, 0.0f, 0.0f, 0.25f,	  // Facing side
-		0.25f, -0.25f, 0.25f, 0.92f, 0.86f, 0.76f, 0.0f, 0.25f, 0.0f, 0.0f, 0.25f,	// Facing Side
-		
-		-0.25f, 0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.0f, 0.0f, 0.0f, -0.25f,  // -Facing side
-		0.25f, 0.25f, -0.25f, 0.83f, 0.70f, 0.44f, 0.25f, 0.25f, 0.0f, 0.0f, -0.25f, // -Facing side
-		-0.25f, -0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.0f, 0.0f, 0.0f, 0.0f, -0.25f,	  // -Facing side
-		0.25f, -0.25f, -0.25f, 0.92f, 0.86f, 0.76f, 0.0f, 0.25f, 0.0f, 0.0f, -0.25f,	// -Facing Side
-	};
-GLuint indices[] =
-	{0, 1, 2, 0, 2, 3, 4, 7, 6, 4, 6, 5, 11, 10, 9, 11, 9, 8, 12, 13, 14, 12, 14, 15, 16, 17, 19, 19, 18, 16, 23, 21, 20, 20, 22, 23};
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
-// Indices for vertices order
-GLuint Pindices[] =
-	{
-		0, 1, 2,	// Bottom side
-		0, 2, 3,	// Bottom side
-		4, 6, 5,	// Left side
-		7, 9, 8,	// Non-facing side
-		10, 12, 11, // Right side
-		13, 15, 14	// Facing side
-};
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                    format == GL_RGBA ? GL_CLAMP_TO_EDGE
+                                      : GL_REPEAT); // for this tutorial: use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-GLfloat lightVertices[] =
-	{ //     COORDINATES     //
-		-0.1f, -0.1f, 0.1f,
-		-0.1f, -0.1f, -0.1f,
-		0.1f, -0.1f, -0.1f,
-		0.1f, -0.1f, 0.1f,
-		-0.1f, 0.1f, 0.1f,
-		-0.1f, 0.1f, -0.1f,
-		0.1f, 0.1f, -0.1f,
-		0.1f, 0.1f, 0.1f};
+    stbi_image_free(data);
+  } else {
+    std::cout << "Texture failed to load at path: " << path << std::endl;
+    stbi_image_free(data);
+  }
+  glBindTexture(GL_TEXTURE_2D, 0);
+  return textureID;
+}
+int main() {
 
-GLuint lightIndices[] =
-	{
-		0, 1, 2,
-		0, 2, 3,
-		0, 4, 7,
-		0, 7, 3,
-		3, 7, 6,
-		3, 6, 2,
-		2, 6, 5,
-		2, 5, 1,
-		1, 5, 4,
-		1, 4, 0,
-		4, 5, 6,
-		4, 6, 7};
+  glm::vec3 cubePos = glm::vec3(0.0f, 0.0f, 0.0f);
+  // glm::mat4 cubeModel = glm::mat4(1.0f);
+  // cubeModel = glm::translate(cubeModel, cubePos);
+  // std::cout << vertices[indices[2]].tangent.x << std::endl;
 
-int main()
-{
+  // std::cout << "tangent: " << vertices[indices[11]].tangent.x << "," << vertices[indices[11]].tangent.y << "," << vertices[indices[11]].tangent.z << std::endl;
 
+  // Initialize GLFW
+  glfwInit();
+  unsigned int sample = 8;
 
-/*
-     const int MAX_SIZE = 100; // Numero massimo di elementi nell'array
-    GLfloat vertices[MAX_SIZE];
-    GLuint arraySize = 0;
+  // Tell GLFW what version of OpenGL we are using
+  // In this case we are using OpenGL 3.3
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_SAMPLES, sample);
 
-    std::ifstream inputFile("vert.txt"); // Sostituisci "file.txt" con il percorso del tuo file di testo
+  // Tell GLFW we are using the CORE profile
+  // So that means we only have the modern functions
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    if (!inputFile.is_open()) {
-        std::cerr << "Impossibile aprire il file." << std::endl;
-        return 1;
-    }
+  // Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
+  GLFWwindow *window = glfwCreateWindow(width, height, "YoutubeOpenGL", NULL, NULL);
+  // Error check if the window fails to create
+  if (window == NULL) {
+    std::cout << "Failed to create GLFW window" << std::endl;
+    glfwTerminate();
+    return -1;
+  }
+  // Introduce the window into the current context
+  glfwMakeContextCurrent(window);
 
-    GLfloat intValue;
-    while (inputFile >> intValue && arraySize < MAX_SIZE) {
-        vertices[arraySize] = intValue;
-        arraySize++;
-    }
+  // Load GLAD so it configures OpenGL
+  gladLoadGL();
+  // Specify the viewport of OpenGL in the Window
+  // In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
+  glViewport(0, 0, width, height);
 
-    inputFile.close();
-
-    // Ora vertices contiene i numeri interi letti dal file
-    for (int i = 0; i < arraySize; i++) {
-        std::cout << vertices[i] << " ";
-    }
-
-
-*/
-	// Initialize GLFW
-	glfwInit();
-
-	// Tell GLFW what version of OpenGL we are using
-	// In this case we are using OpenGL 3.3
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	// Tell GLFW we are using the CORE profile
-	// So that means we only have the modern functions
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
-	GLFWwindow *window = glfwCreateWindow(width, height, "YoutubeOpenGL", NULL, NULL);
-	// Error check if the window fails to create
-	if (window == NULL)
-	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	// Introduce the window into the current context
-	glfwMakeContextCurrent(window);
-
-	// Load GLAD so it configures OpenGL
-	gladLoadGL();
-	// Specify the viewport of OpenGL in the Window
-	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
-	glViewport(0, 0, width, height);
-
-	// Generates Shader object using shaders default.vert and default.frag
-	Shader shaderProgram("default.vert", "default.frag");
-
-	// Generates vertices Array Object and binds it
-	VAO VAO1;
-	VAO1.Bind();
-
-	// Generates vertices Buffer Object and links it to vertices
-	VBO VBO1(vertices, sizeof(vertices));
-	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(indices, sizeof(indices));
-
-	// Links VBO attributes such as coordinates and colors to VAO
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 11 * sizeof(float), (void *)0);
-	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 11 * sizeof(float), (void *)(3 * sizeof(float)));
-	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 11 * sizeof(float), (void *)(6 * sizeof(float)));
-	VAO1.LinkAttrib(VBO1, 3, 3, GL_FLOAT, 11 * sizeof(float), (void *)(8 * sizeof(float)));
-	// Unbind all to prevent accidentally modifying them
-	VAO1.Unbind();
-	VBO1.Unbind();
-	EBO1.Unbind();
-
-	// Shader for light cube
-	Shader lightShader("light.vert", "light.frag");
-	// Generates vertices Array Object and binds it
-	VAO lightVAO;
-	lightVAO.Bind();
-	// Generates vertices Buffer Object and links it to vertices
-	VBO lightVBO(lightVertices, sizeof(lightVertices));
-	// Generates Element Buffer Object and links it to indices
-	EBO lightEBO(lightIndices, sizeof(lightIndices));
-	// Links VBO attributes such as coordinates and colors to VAO
-	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void *)0);
-	// Unbind all to prevent accidentally modifying them
-	lightVAO.Unbind();
-	lightVBO.Unbind();
-	lightEBO.Unbind();
-
-	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);//0.5,0.5,0.5
-	glm::mat4 lightModel = glm::mat4(1.0f);
-	lightModel = glm::translate(lightModel, lightPos);
-
-	glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::mat4 pyramidModel = glm::mat4(1.0f);
-	pyramidModel = glm::translate(pyramidModel, pyramidPos);
-
-	lightShader.Activate();
-	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
-	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	shaderProgram.Activate();
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));//TODO
-	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
-
-	// Gets ID of uniform called "scale"
-	// GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
-
-	Texture brickTex("textures/planks.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	brickTex.texUnit(shaderProgram, "tex0", 0);
-
-	std::string diffusePath = "textures/planks.png";
+  // Generates Shader object using shaders default.vert and default.frag
+  // Shader shaderProgram("default.vert", "default.frag");
+  // Shader for light cube
+  Shader shaderProgram("default.vert", "default.frag");
+  std::string diffusePath = "textures/diffuse.png";
   // Crea normal in textrues/normal_map.png"
-  ImageProcessing ip;
-  ip.compute_normal_map(diffusePath, 1);
-  std::string normalPath = "textures/normal_map.png";
+  // ImageProcessing ip;
+  // ip.compute_normal_map(diffusePath, 1);
+  std::string normalPath = "textures/normal.png";
 
-  //std::vector<Texture> textures = {Texture((diffusePath).c_str(), "diffuse", 0)};
+  Shader lightShader("light.vert", "light.frag");
+  // Shader normalShader("default.vert", "normals.frag", "normals.geom");
 
+  glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 0.0f);
+  glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 2.0f);
+  glm::mat4 lightModel = glm::mat4(1.0f);
+  lightModel = glm::translate(lightModel, lightPos);
 
-	// Variables that help the rotation of the pyramid
-	float rotation = 0.0f;
-	double prevTime = glfwGetTime();
+  // glUniform1i(glGetUniformLocation(shaderProgram.ID, "diffuse0"), 1);
+  // Gets ID of uniform called "scale"
+  // GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
-	// Enables the Depth Buffer
-	glEnable(GL_DEPTH_TEST);
-	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
-	// Main while loop
-	while (!glfwWindowShouldClose(window))
-	{
-		// Specify the color of the background
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-		// Clean the back buffer and depth buffer
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// Tell OpenGL which Shader Program we want to use
-		shaderProgram.Activate();
-		camera.Inputs(window);
-		camera.updateMatrix(45.0f, 0.1f, 100.0f);
-		camera.Matrix(shaderProgram, "camMatrix");
-		// Simple timer
-		double crntTime = glfwGetTime();
-		if (crntTime - prevTime >= 1 / 60)
-		{
-			rotation += 0.009f;
-			prevTime = crntTime;
-		}
+  Texture textures[]{
+      // Texture(diffusePath.c_str(), "diffuse", 0),
+  };
 
-		// Initializes matrices so they are not the null matrix
-		glm::mat4 model = glm::mat4(1.0f);
-		glm::mat4 view = glm::mat4(1.0f);
-		glm::mat4 proj = glm::mat4(1.0f);
+  // glActiveTexture(GL_TEXTURE1);
+  unsigned int diffuseMap = loadTexture(diffusePath.c_str());
+  unsigned int normalMap = loadTexture(normalPath.c_str());
+  shaderProgram.Activate();
+  glUniform1i(glGetUniformLocation(shaderProgram.ID, "diffuse0"), 0);
+  glUniform1i(glGetUniformLocation(shaderProgram.ID, "normal0"), 1);
+  glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+  glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+  // glBindTexture(GL_TEXTURE_2D, normalMap);
+  // Texture normalTex(normalPath.c_str(), "normal", 1);
+  lightShader.Activate();
+  glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+  glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+  // glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(cubeModel));
 
-		// Assigns different transformations to each matrix
-		model = glm::rotate(model, glm::radians(rotation), glm::vec3(1.0f, 0.0f, 0.0f));
-		view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
-		proj = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+  // glUniform1i(glGetUniformLocation(shaderProgram.ID, "normal0"), 1);
 
-		// Outputs the matrices into the vertices Shader
-		int modelLoc = glGetUniformLocation(shaderProgram.ID, "modelrot");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		
-		int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		int projLoc = glGetUniformLocation(shaderProgram.ID, "proj");
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+  // std::vector<Texture> textures = {Texture((diffusePath).c_str(), "diffuse", 0)};
 
-		// Assigns a value to the uniform; NOTE: Must always be done after activating the Shader Program
-		// glUniform1f(uniID, 0.5f);
-		// Binds texture so that is appears in rendering
-		brickTex.Bind();
-		// Bind the VAO so OpenGL knows to use it
-		VAO1.Bind();
-		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
-		// Tells OpenGL which Shader Program we want to use
-		lightShader.Activate();
-		// Export the camMatrix to the vertices Shader of the light cube
-		camera.Matrix(lightShader, "camMatrix");
-		// Bind the VAO so OpenGL knows to use it
-		lightVAO.Bind();
-		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
+  // Variables that help the rotation of the pyramid
+  // float rotation = 0.0f;
+  std::vector<Vertex> v(vertices, vertices + sizeof(vertices) / sizeof(Vertex));
+  std::vector<GLuint> i(indices, indices + sizeof(indices) / sizeof(GLuint));
+  std::vector<Texture> t(textures, textures + sizeof(textures) / sizeof(Texture));
 
-		// Draw primitives, number of indices, datatype of indices, index of indices
-		
-		// Swap the back buffer with the front buffer
-		glfwSwapBuffers(window);
-		// Take care of all GLFW events
-		glfwPollEvents();
-	}
+  std::vector<Texture> app{};
 
-	// Delete all the objects we've created
-	VAO1.Delete();
-	VBO1.Delete();
-	EBO1.Delete();
-	brickTex.Delete();
-	shaderProgram.Delete();
-	lightVAO.Delete();
-	lightVBO.Delete();
-	lightEBO.Delete();
-	lightShader.Delete();
-	// Delete window before ending the program
-	glfwDestroyWindow(window);
-	// Terminate GLFW before ending the program
-	glfwTerminate();
-	return 0;
+  std::vector<Vertex> lv(lightVertices, lightVertices + sizeof(lightVertices) / sizeof(Vertex));
+  std::vector<GLuint> li(lightIndices, lightIndices + sizeof(lightIndices) / sizeof(GLuint));
+  // std::vector<Texture> lt(app,app+sizeof(app)/sizeof(Texture));
+  // Enables the Depth Buffer
+  glEnable(GL_DEPTH_TEST);
+  // glEnable(GL_MULTISAMPLE);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_FRONT);
+  glFrontFace(GL_CW);
+  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 2.0f);
+  Camera camera(width, height, cameraPos);
+
+  glfwSwapInterval(0);
+
+  Mesh meshLight(lv, li, app, width, height);
+
+  double prevTime;
+  double currTime;
+  double timeDiff;
+  unsigned int counter = 0;
+  compute_TangentBitangent();
+  Mesh mesh(v, i, t, width, height);
+
+  while (!glfwWindowShouldClose(window)) {
+    currTime = glfwGetTime();
+    timeDiff = currTime - prevTime;
+    counter++;
+    if (timeDiff >= 1.0 / 30.0) {
+      std::string fps = std::to_string((1.0 / timeDiff) * counter);
+      std::string ms = std::to_string(timeDiff / counter * 1000);
+      std::string title = "FPS: " + fps + " ms: " + ms;
+      glfwSetWindowTitle(window, title.c_str());
+      prevTime = currTime;
+      counter = 0;
+    }
+    // Specify the color of the background
+    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+    // Clean the back buffer and depth buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Tell OpenGL which Shader Program we want to use
+    // shaderProgram.Activate();
+    camera.Inputs(window);
+    camera.updateMatrix(45.0f, 0.1f, 100.0f);
+
+    shaderProgram.Activate();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diffuseMap);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, normalMap);
+    // glUniform1i(glGetUniformLocation(shaderProgram.ID, "normal0"), 1);
+
+    // normalTex.Bind();
+    // normalShader.Activate();
+    // camera.Matrix(shaderProgram, "camMatrix");
+
+    compute_TangentBitangent();
+    std::vector<Vertex> v(vertices, vertices + sizeof(vertices) / sizeof(Vertex));
+    mesh.vertices = v;
+
+    meshLight.Draw(window, lightShader, camera);
+    mesh.DrawAssistant(window, shaderProgram, camera);
+    // mesh.Draw(window, normalShader, camera);
+    glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+
+    // Tells OpenGL which Shader Program we want to use
+    // lightShader.Activate();
+    // Draw primitives, number of indices, datatype of indices, index of indices
+    // glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
+
+    // Draw primitives, number of indices, datatype of indices, index of indices
+
+    // Swap the back buffer with the front buffer
+    glfwSwapBuffers(window);
+    // Take care of all GLFW events
+    glfwPollEvents();
+  }
+
+  // Delete all the objects we've created
+  // VAO1.Delete();
+  // VBO1.Delete();
+  // EBO1.Delete();
+  // brickTex.Delete();
+  // normalTex.Delete();
+  shaderProgram.Delete();
+  // lightVAO.Delete();
+  // lightVBO.Delete();
+  // lightEBO.Delete();
+  lightShader.Delete();
+  // normalShader.Delete();
+  //  Delete window before ending the program
+  glfwDestroyWindow(window);
+  // Terminate GLFW before ending the program
+  glfwTerminate();
+  return 0;
 }
