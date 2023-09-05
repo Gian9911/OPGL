@@ -3,6 +3,7 @@ project(YoutubeOpenG VERSION 0.0.1)
 set(SHADERS 
     ${CMAKE_SOURCE_DIR}/outlining.frag ${CMAKE_SOURCE_DIR}/outlining.vert 
     ${CMAKE_SOURCE_DIR}/normals.geom ${CMAKE_SOURCE_DIR}/normals.frag
+    ${CMAKE_SOURCE_DIR}/normal_mapping.vs ${CMAKE_SOURCE_DIR}/normal_mapping.fs
     ${CMAKE_SOURCE_DIR}/light.vert ${CMAKE_SOURCE_DIR}/light.frag 
     ${CMAKE_SOURCE_DIR}/framebuffer.vert ${CMAKE_SOURCE_DIR}/framebuffer.frag 
     ${CMAKE_SOURCE_DIR}/default.vert ${CMAKE_SOURCE_DIR}/default.frag 
